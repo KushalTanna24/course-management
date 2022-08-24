@@ -7,6 +7,7 @@ const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 
 const login = async (req, res) => {
+  console.log("reached here");
   const { error } = validateUserLogin(req.body);
   if (error) return res.status(400).send(error.details[0].message);
 
@@ -14,7 +15,13 @@ const login = async (req, res) => {
     email: req.body.email,
   });
 
-  if (!user) return res.json({ message: "User not found" }).status(400);
+  if (!user)
+    return res.json({
+      message: "User not found",
+      ok: false,
+      status: 400,
+      isLogin: false,
+    });
 
   const isPasswordValid = await bcrypt.compare(
     req.body.password,
@@ -31,23 +38,32 @@ const login = async (req, res) => {
     );
 
     res.json({
-      status: "success",
+      status: "200",
       message: "Login Successful",
+      ok: true,
+      isLogin: true,
       token,
     });
   } else {
-    return res
-      .json({
-        status: "error",
-        message: "Invalid Password",
-      })
-      .status(400);
+    return res.json({
+      status: "400",
+      message: "Invalid Password",
+      isLogin: false,
+      ok: false,
+    });
   }
 };
 
 const register = async (req, res) => {
   const { error } = validateUserRegisteration(req.body);
-  if (error) return res.status(400).send(error.details[0].message);
+  if (error)
+    return res.json({
+      ok: false,
+      status: 400,
+      message: error.details[0].message,
+      isRegister: false,
+    });
+
   const newPassword = await bcrypt.hash(req.body.password, 10);
 
   const user = new User({
@@ -61,9 +77,19 @@ const register = async (req, res) => {
   });
   const result = await user.save();
   if (!result) {
-    return res.status(400).send("Product not saved");
+    return res.json({
+      ok: false,
+      status: 400,
+      message: "Registeration fail",
+      isRegister: false,
+    });
   }
-  res.send(result);
+  res.json({
+    ok: true,
+    status: 200,
+    message: "Registeration Successful",
+    isRegister: true,
+  });
 };
 
 module.exports = {
