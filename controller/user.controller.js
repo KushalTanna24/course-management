@@ -42,6 +42,9 @@ const login = async (req, res) => {
       message: "Login Successful",
       ok: true,
       isLogin: true,
+      type: user.type,
+      role: user.role,
+      name: user.name,
       token,
     });
   } else {
