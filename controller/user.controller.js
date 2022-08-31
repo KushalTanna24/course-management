@@ -20,7 +20,6 @@ const login = async (req, res) => {
       message: "User not found",
       ok: false,
       status: 400,
-      isLogin: false,
     });
 
   const isPasswordValid = await bcrypt.compare(
@@ -41,7 +40,7 @@ const login = async (req, res) => {
       status: "200",
       message: "Login Successful",
       ok: true,
-      isLogin: true,
+      email: user.email,
       type: user.type,
       role: user.role,
       name: user.name,
@@ -51,7 +50,6 @@ const login = async (req, res) => {
     return res.json({
       status: "400",
       message: "Invalid Password",
-      isLogin: false,
       ok: false,
     });
   }

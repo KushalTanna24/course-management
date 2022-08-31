@@ -1,5 +1,5 @@
-const mongoose = require('mongoose')
-const Joi = require('joi')
+const mongoose = require("mongoose");
+const Joi = require("joi");
 
 const userSchema = new mongoose.Schema({
   email: {
@@ -32,13 +32,13 @@ const userSchema = new mongoose.Schema({
   },
   type: {
     type: String,
-    default: 'Admin',
+    default: "Admin",
   },
   createdAt: {
     type: Date,
     default: Date.now,
   },
-})
+});
 
 const validateUserRegisteration = (user) => {
   const schema = Joi.object({
@@ -48,18 +48,28 @@ const validateUserRegisteration = (user) => {
     password: Joi.string().min(6).max(1024).required(),
     role: Joi.array().min(1).max(255).required(),
     type: Joi.string().min(1).max(255),
-  })
-  return schema.validate(user)
-}
+  });
+  return schema.validate(user);
+};
 
 const validateUserLogin = (user) => {
   const schema = Joi.object({
-    email: Joi.string().email().required().min(1).max(255),
-    password: Joi.string().required().min(6).max(1024),
-  })
-  return schema.validate(user)
-}
+    email: Joi.string().email().required().min(1).max(255).messages({
+      "string.empty": "Email is required",
+      "string.min": "Email is too short",
+      "string.max": "Email is too long",
+      "string.email": "Email is invalid",
+    }),
+    password: Joi.string().required().min(6).max(1024).messages({
+      "string.base": "Password must be a string",
+      "string.empty": "Password must not be empty",
+      "string.min": "Password must be at least 6 characters",
+      "string.max": "Password must be at most 1024 characters",
+    }),
+  });
+  return schema.validate(user);
+};
 
-const User = mongoose.model('users', userSchema)
+const User = mongoose.model("users", userSchema);
 
-module.exports = { User, validateUserRegisteration, validateUserLogin }
+module.exports = { User, validateUserRegisteration, validateUserLogin };
